@@ -333,9 +333,16 @@
                 const response = await fetch('/api/dashboard/overview', {
                     headers: { 'X-Telegram-Init-Data': tg.initData },
                 });
-                const data = await response.json();
-                if (!response.ok || !data.success) {
-                    throw new Error(data.error || `Ошибка сервера (${response.status})`);
+                const rawText = await response.text();
+                let data = null;
+                try {
+                    data = JSON.parse(rawText);
+                } catch {
+                    // Non-JSON response (e.g. a platform error page) — surface it raw below.
+                }
+                if (!response.ok || !data || !data.success) {
+                    const detail = (data && data.error) || rawText.slice(0, 300) || 'пустой ответ';
+                    throw new Error(`HTTP ${response.status}: ${detail}`);
                 }
                 render(data);
             } catch (err) {
