@@ -26,10 +26,8 @@ function summarize(records) {
 // staff leaderboard, all derived from one month-wide records fetch.
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(204).end();
-  // TEMPORARY: Telegram auth disabled to isolate a 403 seen only from inside
-  // the Mini App webview. MUST be restored before real use — see chat.
-  // const user = requireTelegramUser(req, res);
-  // if (!user) return;
+  const user = requireTelegramUser(req, res);
+  if (!user) return;
 
   try {
     const companyId = getCompanyId();
