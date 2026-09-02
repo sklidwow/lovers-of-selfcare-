@@ -25,6 +25,7 @@ function summarize(records) {
 // Single round trip for the whole mini app: today/week/month figures plus a
 // staff leaderboard, all derived from one month-wide records fetch.
 module.exports = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'OPTIONS') return res.status(204).end();
   const user = requireTelegramUser(req, res);
   if (!user) return;
