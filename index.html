@@ -331,7 +331,7 @@
 
             try {
                 const response = await fetch('/api/dashboard/overview', {
-                    headers: { 'X-Telegram-Init-Data': tg.initData },
+                    headers: { 'X-Init-Data': tg.initData },
                 });
                 const rawText = await response.text();
                 let data = null;
