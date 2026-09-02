@@ -2,8 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lovers of Selfcare</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Los Brows — Дашборд</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -11,350 +12,346 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --accent: #d4847d;
+            --accent-dark: #c9746f;
+            --ink: #3a2a2a;
+            --ink-muted: #8a7373;
+            --surface: #ffffff;
+            --bg: #fef5f0;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #fef5f0 0%, #faf3f0 50%, #f5f0f8 100%);
+            color: var(--ink);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            padding: 20px 16px 40px;
         }
 
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 40px;
-            padding: 40px 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
+        .header {
             text-align: center;
+            margin-bottom: 24px;
         }
 
-        h1 {
-            font-size: 32px;
-            color: #d4847d;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .subtitle {
-            color: #b8a0a0;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .wheel-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 0 auto 30px;
-        }
-
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            box-shadow: 0 15px 40px rgba(212, 132, 125, 0.2);
-            cursor: pointer;
-        }
-
-        .pointer {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid #d4847d;
-            z-index: 10;
-        }
-
-        .button {
-            width: 100%;
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            color: white;
-            background: linear-gradient(135deg, #d4847d 0%, #c9746f 100%);
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(212, 132, 125, 0.3);
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-
-        .button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(212, 132, 125, 0.4);
-        }
-
-        .button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .result {
-            background: linear-gradient(135deg, rgba(212, 132, 125, 0.1) 0%, rgba(230, 200, 190, 0.1) 100%);
-            border: 2px solid rgba(212, 132, 125, 0.2);
-            border-radius: 20px;
-            padding: 20px;
-            min-height: 80px;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        .result.show {
-            display: flex;
-        }
-
-        .result-emoji {
-            font-size: 32px;
-            animation: bounce 0.6s ease-in-out;
-        }
-
-        .result-text {
+        .header h1 {
             font-size: 22px;
             font-weight: 700;
-            color: #d4847d;
+            color: var(--accent-dark);
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.3); }
+        .header p {
+            font-size: 13px;
+            color: var(--ink-muted);
+            margin-top: 4px;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ink-muted);
+            font-size: 14px;
+            line-height: 1.6;
         }
 
-        .history {
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 1px solid rgba(212, 132, 125, 0.1);
+        .state.error {
+            color: #b34a4a;
         }
 
-        .history-label {
-            color: #b8a0a0;
-            font-size: 12px;
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 12px;
-            letter-spacing: 1px;
+        [hidden] {
+            display: none !important;
         }
 
-        .history-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
         }
 
-        .history-item {
-            background: linear-gradient(135deg, #fef5f0 0%, #faf3f0 100%);
-            padding: 8px 12px;
-            border-radius: 15px;
+        .kpi-card {
+            background: var(--surface);
+            border-radius: 18px;
+            padding: 14px 10px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(212, 132, 125, 0.12);
+        }
+
+        .kpi-label {
             font-size: 11px;
-            color: #d4847d;
-            border: 1px solid rgba(212, 132, 125, 0.15);
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .kpi-revenue {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .kpi-bookings {
+            font-size: 12px;
+            color: var(--accent-dark);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .section {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: 0 8px 24px rgba(212, 132, 125, 0.1);
+            margin-bottom: 16px;
+        }
+
+        .section h2 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 14px;
+        }
+
+        .staff-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(212, 132, 125, 0.1);
+        }
+
+        .staff-row:last-child {
+            border-bottom: none;
+        }
+
+        .staff-name {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .staff-rank {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--bg);
+            color: var(--accent-dark);
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .staff-figures {
+            text-align: right;
+        }
+
+        .staff-revenue {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .staff-bookings {
+            font-size: 11px;
+            color: var(--ink-muted);
+        }
+
+        .empty {
+            font-size: 13px;
+            color: var(--ink-muted);
+            text-align: center;
+            padding: 12px 0;
+        }
+
+        .refresh {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .refresh:disabled {
+            opacity: 0.6;
+        }
+
+        .updated-at {
+            text-align: center;
+            font-size: 11px;
+            color: var(--ink-muted);
+            margin-top: 12px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #1c1416;
+                color: #f0e6e6;
+            }
+            :root {
+                --surface: #2a1f21;
+                --ink: #f0e6e6;
+                --ink-muted: #b09a9a;
+                --bg: #3a2a2c;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>✨ Lovers of Selfcare</h1>
-        <p class="subtitle">Крутите колесо и получайте награды красоты!</p>
+    <div class="header">
+        <h1 id="companyTitle">Los Brows</h1>
+        <p id="companySubtitle">Дашборд</p>
+    </div>
 
-        <div class="wheel-container">
-            <div class="pointer"></div>
-            <canvas id="wheelCanvas" width="300" height="300"></canvas>
-        </div>
+    <div class="state" id="loadingState">Загружаю данные…</div>
+    <div class="state error" hidden id="errorState"></div>
 
-        <button class="button" id="spinBtn">КРУТИТЬ</button>
-
-        <div class="result" id="result">
-            <span class="result-emoji" id="emoji">🎁</span>
-            <span class="result-text" id="resultText">Ваш приз</span>
-        </div>
-
-        <div class="history">
-            <div class="history-label">История</div>
-            <div class="history-items" id="historyItems">
-                <span class="history-item">Нет истории</span>
+    <div id="dashboard" hidden>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Сегодня</div>
+                <div class="kpi-revenue" id="todayRevenue">—</div>
+                <div class="kpi-bookings" id="todayBookings">—</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Неделя</div>
+                <div class="kpi-revenue" id="weekRevenue">—</div>
+                <div class="kpi-bookings" id="weekBookings">—</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Месяц</div>
+                <div class="kpi-revenue" id="monthRevenue">—</div>
+                <div class="kpi-bookings" id="monthBookings">—</div>
             </div>
         </div>
+
+        <div class="section">
+            <h2>Топ мастеров за месяц</h2>
+            <div id="staffList"></div>
+        </div>
+
+        <button class="refresh" id="refreshBtn">Обновить</button>
+        <div class="updated-at" id="updatedAt"></div>
     </div>
 
     <script>
-        const canvas = document.getElementById('wheelCanvas');
-        const ctx = canvas.getContext('2d');
-        const spinBtn = document.getElementById('spinBtn');
-        const resultDiv = document.getElementById('result');
-        const emojiSpan = document.getElementById('emoji');
-        const resultText = document.getElementById('resultText');
-        const historyItems = document.getElementById('historyItems');
+        const tg = window.Telegram && window.Telegram.WebApp;
 
-        const prizes = [
-            { emoji: '💅', name: 'Бесплатный маникюр' },
-            { emoji: '🌈', name: 'Окрашивание бровей' },
-            { emoji: '💸', name: 'Депозит 1000 руб' },
-            { emoji: '✨', name: 'Ламинирование ресниц' },
-            { emoji: '💅', name: 'Бесплатный маникюр' },
-            { emoji: '🌈', name: 'Окрашивание бровей' },
-            { emoji: '💸', name: 'Депозит 1000 руб' },
-            { emoji: '✨', name: 'Ламинирование ресниц' }
-        ];
+        const money = new Intl.NumberFormat('ru-RU', {
+            style: 'currency',
+            currency: 'RUB',
+            maximumFractionDigits: 0,
+        });
 
-        const colors = ['#f4d9d3', '#e8cfd8', '#d4e8e4', '#e6d9f0', '#f0e8d4', '#f5e0d9', '#e0e8e8', '#ead8d4'];
+        function bookingsLabel(count) {
+            const mod10 = count % 10;
+            const mod100 = count % 100;
+            let word = 'записей';
+            if (mod100 < 11 || mod100 > 14) {
+                if (mod10 === 1) word = 'запись';
+                else if (mod10 >= 2 && mod10 <= 4) word = 'записи';
+            }
+            return `${count} ${word}`;
+        }
 
-        let rotation = 0;
-        let isSpinning = false;
-        let history = [];
+        function renderStaff(list) {
+            const el = document.getElementById('staffList');
+            if (!list || list.length === 0) {
+                el.innerHTML = '<div class="empty">Пока нет записей за месяц</div>';
+                return;
+            }
+            el.innerHTML = list
+                .map(
+                    (s, i) => `
+                <div class="staff-row">
+                    <div class="staff-name"><span class="staff-rank">${i + 1}</span>${s.name}</div>
+                    <div class="staff-figures">
+                        <div class="staff-revenue">${money.format(s.revenue)}</div>
+                        <div class="staff-bookings">${bookingsLabel(s.bookings)}</div>
+                    </div>
+                </div>`
+                )
+                .join('');
+        }
 
-        function drawWheel() {
-            const centerX = 150;
-            const centerY = 150;
-            const radius = 140;
+        function render(data) {
+            if (data.company?.title) {
+                document.getElementById('companyTitle').textContent = data.company.title;
+            }
+            if (data.company?.city) {
+                document.getElementById('companySubtitle').textContent = `Дашборд · ${data.company.city}`;
+            }
 
-            ctx.clearRect(0, 0, 300, 300);
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate((rotation * Math.PI) / 180);
+            document.getElementById('todayRevenue').textContent = money.format(data.today.revenue);
+            document.getElementById('todayBookings').textContent = bookingsLabel(data.today.bookings);
+            document.getElementById('weekRevenue').textContent = money.format(data.week.revenue);
+            document.getElementById('weekBookings').textContent = bookingsLabel(data.week.bookings);
+            document.getElementById('monthRevenue').textContent = money.format(data.month.revenue);
+            document.getElementById('monthBookings').textContent = bookingsLabel(data.month.bookings);
 
-            const sliceAngle = 360 / prizes.length;
+            renderStaff(data.topStaff);
 
-            prizes.forEach((prize, i) => {
-                const startAngle = (i * sliceAngle * Math.PI) / 180;
-                const endAngle = ((i + 1) * sliceAngle * Math.PI) / 180;
+            const updated = new Date(data.generatedAt);
+            document.getElementById('updatedAt').textContent = `Обновлено в ${updated.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit',
+            })}`;
 
-                ctx.fillStyle = colors[i];
-                ctx.beginPath();
-                ctx.arc(0, 0, radius, startAngle, endAngle);
-                ctx.lineTo(0, 0);
-                ctx.fill();
+            document.getElementById('loadingState').hidden = true;
+            document.getElementById('errorState').hidden = true;
+            document.getElementById('dashboard').hidden = false;
+        }
 
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(0, 0, radius, startAngle, endAngle);
-                ctx.lineTo(0, 0);
-                ctx.stroke();
+        function showError(message) {
+            document.getElementById('loadingState').hidden = true;
+            document.getElementById('dashboard').hidden = true;
+            const el = document.getElementById('errorState');
+            el.textContent = message;
+            el.hidden = false;
+        }
 
-                const textAngle = startAngle + (endAngle - startAngle) / 2;
-                const textX = Math.cos(textAngle) * 95;
-                const textY = Math.sin(textAngle) * 95;
+        async function loadDashboard() {
+            if (!tg || !tg.initData) {
+                showError('Откройте дашборд через Telegram-бота — вне Telegram доступ к данным закрыт.');
+                return;
+            }
 
-                ctx.save();
-                ctx.translate(textX, textY);
-                ctx.rotate(textAngle + Math.PI / 2);
-                ctx.fillStyle = '#664444';
-                ctx.font = 'bold 12px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(prize.emoji, 0, -8);
-                ctx.font = '9px Arial';
-                
-                const words = prize.name.split(' ');
-                let line1 = '';
-                let line2 = '';
-                
-                if (words.length === 1) {
-                    line1 = words[0];
-                } else if (words.length === 2) {
-                    line1 = words[0];
-                    line2 = words[1];
-                } else {
-                    line1 = words.slice(0, Math.ceil(words.length / 2)).join(' ');
-                    line2 = words.slice(Math.ceil(words.length / 2)).join(' ');
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) refreshBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/dashboard/overview', {
+                    headers: { 'X-Telegram-Init-Data': tg.initData },
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || `Ошибка сервера (${response.status})`);
                 }
-                
-                ctx.fillText(line1, 0, 6);
-                if (line2) ctx.fillText(line2, 0, 16);
-                ctx.restore();
-            });
-
-            ctx.restore();
-        }
-
-        function spinWheel() {
-            if (isSpinning) return;
-
-            isSpinning = true;
-            spinBtn.disabled = true;
-            resultDiv.classList.remove('show');
-
-            const spins = 5 + Math.random() * 3;
-            const randomDegree = Math.random() * 360;
-            const targetRotation = spins * 360 + randomDegree;
-
-            let currentRotation = 0;
-            const duration = 4000;
-            const startTime = Date.now();
-
-            function easeOut(t) {
-                return 1 - Math.pow(1 - t, 3);
-            }
-
-            function animate() {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeProgress = easeOut(progress);
-
-                rotation = (rotation + targetRotation * easeProgress) % 360;
-                drawWheel();
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    isSpinning = false;
-                    spinBtn.disabled = false;
-
-                    const normalizedRotation = (360 - rotation) % 360;
-                    const sliceAngle = 360 / prizes.length;
-                    const winIndex = Math.floor(normalizedRotation / sliceAngle) % prizes.length;
-                    const winner = prizes[winIndex];
-
-                    emojiSpan.textContent = winner.emoji;
-                    resultText.textContent = winner.name;
-                    resultDiv.classList.add('show');
-
-                    history.unshift(winner.name);
-                    if (history.length > 10) history.pop();
-                    updateHistory();
-                }
-            }
-
-            animate();
-        }
-
-        function updateHistory() {
-            if (history.length === 0) {
-                historyItems.innerHTML = '<span class="history-item">Нет истории</span>';
-            } else {
-                historyItems.innerHTML = history.map(h => `<span class="history-item">${h}</span>`).join('');
+                render(data);
+            } catch (err) {
+                showError(err.message || 'Не удалось загрузить данные');
+            } finally {
+                if (refreshBtn) refreshBtn.disabled = false;
             }
         }
 
-        spinBtn.addEventListener('click', spinWheel);
-        canvas.addEventListener('click', spinWheel);
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
 
-        drawWheel();
+        document.getElementById('refreshBtn')?.addEventListener('click', loadDashboard);
+        loadDashboard();
     </script>
 </body>
 </html>
