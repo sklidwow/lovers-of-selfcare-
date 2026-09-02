@@ -7,7 +7,7 @@
 Токен YClients хранится только в переменных окружения на сервере и никогда не
 попадает в браузер.
 
-`api/dashboard/overview.js` — данные для мини-аппа, доступ только через
+`api/dashboard/summary-v2.js` — данные для мини-аппа, доступ только через
 проверенный Telegram (см. ниже).
 
 ## Настройка
@@ -51,7 +51,7 @@
 - `GET /api/yclients/clients?name=&phone=&page=&count=` — поиск клиентов.
 - `GET /api/yclients/analytics/summary?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD` — готовая агрегация для дашборда: сумма бронирований и выручки, разбивка по дням, по сотрудникам, по статусу визита.
 
-`GET /api/dashboard/overview` — отдельный эндпоинт для Telegram Mini App.
+`GET /api/dashboard/summary-v2` — отдельный эндпоинт для Telegram Mini App.
 Требует заголовок `X-Init-Data` (его мини-апп подставляет сам из
 `Telegram.WebApp.initData`), а не `X-Api-Key`. Отдаёт сегодня/неделю/месяц по
 броням и выручке плюс топ-5 мастеров за месяц.
